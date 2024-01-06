@@ -8,9 +8,16 @@ class VideoStreamHandler:
     def __init__(self, root, canvas):
         self.root = root
         self.canvas = canvas
-        self.cap = cv2.VideoCapture(0)
+        self.cap = None
         self.photo = None
         self.current_frame = None
+
+    def start_stream(self, camera_index):
+        if self.cap is not None:
+            self.cap.release()
+        self.cap = cv2.VideoCapture(int(camera_index))
+        thread = threading.Thread(target=self.video_stream)
+        thread.start()
 
     def video_stream(self):
         while self.cap.isOpened():
@@ -23,12 +30,8 @@ class VideoStreamHandler:
                 self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
                 self.root.update()
 
-    def start_stream(self):
-        thread = threading.Thread(target=self.video_stream)
-        thread.start()
-
     def stop_video(self):
-        if self.cap.isOpened():
+        if self.cap is not None and self.cap.isOpened():
             self.cap.release()
         self.root.destroy()
 
