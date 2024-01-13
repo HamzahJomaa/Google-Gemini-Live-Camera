@@ -98,6 +98,7 @@ class ContentDescriber:
         )
         button_camera.pack(side=tk.TOP, padx=5, pady=5)
 
+
     def get_available_cameras(self):
         available_cameras = []
         for i in range(10):

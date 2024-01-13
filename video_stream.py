@@ -19,6 +19,13 @@ class VideoStreamHandler:
         self.update_video_stream()
         self.after_id = self.root.after(10, self.video_stream)
 
+    def start_stream(self, camera_index):
+        if self.cap is not None:
+            self.cap.release()
+        self.cap = cv2.VideoCapture(int(camera_index))
+        thread = threading.Thread(target=self.video_stream)
+        thread.start()
+
     def video_stream(self):
         ret, frame = self.cap.read()
         if ret:
@@ -31,7 +38,6 @@ class VideoStreamHandler:
             else:
                 self.photo = ImageTk.PhotoImage(image=img)
                 self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-
             self.after_id = self.root.after(10, self.video_stream)
 
     def update_video_stream(self):
