@@ -22,52 +22,60 @@ class ContentDescriber:
         self.video_handler = video_handler
         self.message_var = tk.StringVar()
         self.language_var = tk.StringVar()
-        self.language_var.set("en")  # Default language (en)
+        self.language_var.set("en")
         self.languages = {
             "en": "English",
-            "tr": "Turkish", 
-            "de": "German",  
-            "ar": "Arabic",  
+            "tr": "Turkish",
+            "de": "German",
+            "ar": "Arabic",
         }
-        self.message_label = tk.Label(
-            root, textvariable=self.message_var, wraplength=500, anchor=tk.E
-        )
-        self.message_label.pack()
-        screen_width = root.winfo_screenwidth()
-        self.message_label.place(relx=0.95, rely=0.5, anchor=tk.E)
 
         self.camera_var = tk.StringVar()
-        self.camera_var.set("0")  # Default select camera(0)
+        self.camera_var.set("0")
 
-        camera_label = tk.Label(root, text="Select Camera:")
-        camera_label.pack()
+        frame_main = tk.Frame(root)
+        frame_main.pack()
+
+        frame_language_camera = tk.Frame(frame_main)
+        frame_language_camera.pack(side=tk.TOP)
+
+        camera_label = tk.Label(frame_language_camera, text="Select Camera:")
+        camera_label.pack(side=tk.LEFT, padx=5, pady=5)
 
         camera_menu = tk.OptionMenu(
-            root, self.camera_var, *self.get_available_cameras()
+            frame_language_camera, self.camera_var, *self.get_available_cameras()
         )
-        camera_menu.pack()
+        camera_menu.pack(side=tk.LEFT, padx=5, pady=5)
 
-        language_label = tk.Label(root, text="Select Language:")
-        language_label.pack()
+        language_label = tk.Label(frame_language_camera, text="Select Language:")
+        language_label.pack(side=tk.LEFT, padx=5, pady=5)
 
-        language_menu = tk.OptionMenu(root, self.language_var, *self.languages.keys())
-        language_menu.pack()
+        language_menu = tk.OptionMenu(
+            frame_language_camera, self.language_var, *self.languages.keys()
+        )
+        language_menu.pack(side=tk.LEFT, padx=5, pady=5)
 
-        #Includes frames for layout in 2 rows
-        frame_top = tk.Frame(root)
-        frame_top.pack(side=tk.TOP)
+        self.message_label = tk.Label(
+            frame_main, textvariable=self.message_var, wraplength=500, anchor=tk.E
+        )
+        self.message_label.pack(side=tk.BOTTOM)
 
-        frame_bottom = tk.Frame(root)
-        frame_bottom.pack(side=tk.TOP)
+        frame_buttons = tk.Frame(frame_main)
+        frame_buttons.pack(side=tk.TOP)
 
-        # Buttons are placed in relevant frames
+        frame_buttons_top = tk.Frame(frame_buttons)
+        frame_buttons_top.pack(side=tk.TOP)
+
+        frame_buttons_bottom = tk.Frame(frame_buttons)
+        frame_buttons_bottom.pack(side=tk.TOP)
+
         button_stop = tk.Button(
-            frame_top, text="Stop", width=50, command=video_handler.stop_video
+            frame_buttons_top, text="Stop", width=50, command=video_handler.stop_video
         )
         button_stop.pack(side=tk.LEFT, padx=5, pady=5)
 
         button_describe = tk.Button(
-            frame_top,
+            frame_buttons_top,
             text="Describe the frame",
             width=50,
             command=lambda: self.threaded_describe_content(),
@@ -75,17 +83,21 @@ class ContentDescriber:
         button_describe.pack(side=tk.LEFT, padx=5, pady=5)
 
         button_tts = tk.Button(
-            frame_top, text="Text-to-Speech", width=50, command=self.text_to_speech
+            frame_buttons_top,
+            text="Text-to-Speech",
+            width=50,
+            command=self.text_to_speech,
         )
         button_tts.pack(side=tk.LEFT, padx=5, pady=5)
 
         button_camera = tk.Button(
-            frame_bottom,
+            frame_buttons_bottom,
             text="Select Camera",
             width=50,
             command=lambda: video_handler.start_stream(self.camera_var.get()),
         )
-        button_camera.pack(side=tk.LEFT, padx=5, pady=5)
+        button_camera.pack(side=tk.TOP, padx=5, pady=5)
+
 
     def get_available_cameras(self):
         available_cameras = []
@@ -97,7 +109,6 @@ class ContentDescriber:
         return available_cameras
 
     def describe_content(self):
-        # Clear previous text when clicked the describe button
         self.message_var.set("")
 
         current_frame = self.video_handler.get_current_frame()
